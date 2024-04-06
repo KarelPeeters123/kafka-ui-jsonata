@@ -1,4 +1,4 @@
-import React, { Suspense, useContext } from 'react';
+import React, { Suspense, useContext, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import {
   accessErrorPage,
@@ -19,12 +19,15 @@ import GlobalCSS from 'components/globalCss';
 import * as S from 'components/App.styled';
 import ClusterConfigForm from 'widgets/ClusterConfigForm';
 import { ThemeModeContext } from 'components/contexts/ThemeModeContext';
-import { ButtonWrapper, JsonataObject, JsonataQuery, Wrapper, TextArea } from './Jsonata.styled';
+import { ButtonWrapper, JsonataObject, JsonataQuery, Wrapper, TextArea, JsonWrapper } from './Jsonata.styled';
 import { Button } from 'components/common/Button/Button';
+
+import jsonata from "jsonata";
+import ReactJson from 'react-json-view'
 
 const Jsonata: React.FC = () => {
   const { isDarkMode } = useContext(ThemeModeContext);
-  const jsonObject = JSON.stringify(
+  const [jsonObject, setJsonObject] = useState(
     {
         "FirstName": "Fred",
         "Surname": "Smith",
@@ -76,35 +79,53 @@ const Jsonata: React.FC = () => {
                 "Postcode": "E1 6RF"
             }
         }
-    }, 
-    null, 
-    4
-  )
+    });
+  const [query, setQuery] = useState('');
+  const [output, setOutput] = useState({});
+
+  const applyQuery = async () => {
+    if (query) {
+        var result = await jsonata(query).evaluate(jsonObject);
+        setOutput(result);
+    }
+  }
+  const updateQuery = (e: any) => {
+    setQuery(e.target.value);
+  }
+  const copyQueryToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(query);
+      console.log('Content copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  }
 
     return (
         <Wrapper>
             <JsonataObject>
-                <TextArea>
-                    {jsonObject}
-                </TextArea>
+                <JsonWrapper>
+                    <ReactJson src={jsonObject} theme="summerfruit:inverted"/>
+                </JsonWrapper>
             </JsonataObject>
             <JsonataQuery>
                 <div className='jsonata query input' style={{height: '50%'}}>
-                    <TextArea>
-                    </TextArea>
+                    <TextArea value={query} onChange={updateQuery}/>
                 </div>
                 <ButtonWrapper>
-                    <Button buttonType="primary" buttonSize="L" style={{margin: '5px'}}>
-                        Run
+                    <Button buttonType="primary" buttonSize="L" style={{margin: '5px'}} onClick={applyQuery}>
+                        Run Query
+                    </Button>
+                    <Button buttonType="primary" buttonSize="L" style={{margin: '5px'}} onClick={copyQueryToClipboard}>
+                        Copy Query
                     </Button>
                     <Button buttonType="primary" buttonSize="L" style={{margin: '5px'}}>
-                        Save
+                        Save Query
                     </Button>
                 </ButtonWrapper>
-                <div className='jsonata query output' style={{height: '50%'}}>
-                    <TextArea>
-                    </TextArea>
-                </div>
+                <JsonWrapper style={{height: '50%'}}>
+                    <ReactJson src={output} theme="summerfruit:inverted"/>
+                </JsonWrapper>
             </JsonataQuery>
         </Wrapper>
     )

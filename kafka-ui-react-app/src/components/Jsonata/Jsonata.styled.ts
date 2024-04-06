@@ -3,6 +3,12 @@ import styled from 'styled-components';
 export const TextArea = styled.textarea`
   width: 100%;
   height: 100%;
+  padding: 5px;
+`;
+export const JsonWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
 `;
 export const Wrapper = styled.div`
   display: flex;
