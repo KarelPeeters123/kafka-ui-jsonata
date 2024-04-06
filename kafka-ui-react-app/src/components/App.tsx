@@ -26,6 +26,7 @@ import { GlobalSettingsProvider } from './contexts/GlobalSettingsContext';
 import ErrorPage from './ErrorPage/ErrorPage';
 import { UserInfoRolesAccessProvider } from './contexts/UserInfoRolesAccessContext';
 import PageContainer from './PageContainer/PageContainer';
+import Jsonata from './Jsonata/Jsonata';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +83,10 @@ const App: React.FC = () => {
                       <Route
                         path="*"
                         element={<Navigate to={errorPage} replace />}
+                      />
+                      <Route
+                        path="jsonata"
+                        element={<Jsonata/>}
                       />
                     </Routes>
                   </PageContainer>
